@@ -13,14 +13,8 @@ INV_RESULTS = {"r": {"me": "p", "=": "r", "you": "s"},
 
 TRANSLATION = {"A": "r", "B": "p", "C": "s", "X": "r", "Y": "p", "Z": "s"}
 
-def translate(me, you):
-    t_me = TRANSLATION[me]
-
-    return t_me
-
 def round_score(me, result):
     return POINTS[me] + POINTS[result]
-
 
 def run(strat):
     total_score1 = 0
@@ -34,8 +28,6 @@ def run(strat):
 
         result2 = WANTED_RESULT[me]
         t_me2 = INV_RESULTS[t_you][result2]
-
-
 
         total_score1 = total_score1 + round_score(t_me1, result1)
         total_score2 = total_score2 + round_score(t_me2, result2)
