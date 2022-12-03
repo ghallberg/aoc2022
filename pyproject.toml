@@ -5,7 +5,9 @@ description = ""
 authors = [
     {name = "Gustaf Hallberg", email = "ghallberg@gmail.com"},
 ]
-dependencies = []
+dependencies = [
+    "more-itertools>=9.0.0",
+]
 requires-python = ">=3.10"
 license = {text = "MIT"}
 [project.optional-dependencies]
