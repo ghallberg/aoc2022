@@ -47,18 +47,14 @@ def parse(data: Sequence[str]):
 
     return flip_stacks(box_lines), commands
 
-def move(stacks, command: Command):
-    for _ in range(0, command.count):
-        box = stacks[command.origin-1].pop()
-        stacks[command.target-1].append(box)
-
-def move2(stacks, command: Command):
+def move(stacks, command: Command, version: int):
     moving_stack = []
     for _ in range(0, command.count):
         box = stacks[command.origin-1].pop()
         moving_stack.append(box)
 
-    moving_stack.reverse()
+    if version == 9001:
+        moving_stack.reverse()
     stacks[command.target-1] += moving_stack
 
 def get_output(stacks):
@@ -70,8 +66,8 @@ def run(data: Sequence[str]):
     stacks2 = deepcopy(stacks)
 
     for command in commands:
-        move(stacks, command)
-        move2(stacks2, command)
+        move(stacks, command, 9000)
+        move(stacks2, command, 9001)
 
 
     print(get_output(stacks))
