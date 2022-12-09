@@ -36,10 +36,7 @@ def score_towards(height: int, view: list[int]):
     for i, other in enumerate(view):
         if other >= height:
             return i+1
-
     return len(view)
-
-
 
 def scenic_in(i:int, row: list[int]) -> bool:
     height = row[i]
