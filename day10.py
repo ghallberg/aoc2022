@@ -4,9 +4,6 @@ from more_itertools import ichunked
 INPUT_FILE = "input/day10.txt"
 TEST_FILES = [ "input/day10test.txt", "input/day10test2.txt"]
 
-operation_CYCLES = {"noop": 1,
-                    "addx": 2}
-
 def parse(line):
     command = line.strip().split()
 
@@ -25,7 +22,6 @@ def get_screen(screen) -> None:
     str_lines = ["".join(scan_line) for scan_line in scan_lines]
     return "\n".join(str_lines)
 
-
 def run(data: list[str]):
     ops = sum([parse(line) for line in data],[])
 
@@ -35,20 +31,20 @@ def run(data: list[str]):
     screen = []
 
     for cycle, op in enumerate(ops, 1):
+        if (cycle - 20) % 40 == 0:
+            interesting_values.append(sprite_pos * cycle)
+
         if should_draw_pos(cycle, sprite_pos):
             screen.append("#")
         else:
             screen.append(".")
 
-        if (cycle - 20) % 40 == 0:
-            interesting_values.append(sprite_pos * cycle)
-
         sprite_pos += op
 
-    print("\nPART 1:\n")
-    print(sum(interesting_values))
-    print("\nPART 2:\n")
-    print(get_screen(screen))
+    part1 = sum(interesting_values)
+    part2 = get_screen(screen)
+
+    return part1, part2
 
 if __name__ == '__main__':
     if len(sys.argv) == 2:
@@ -59,4 +55,9 @@ if __name__ == '__main__':
         input_file = INPUT_FILE
 
     with open(input_file, encoding="utf8") as lines:
-        run(list(lines))
+        part1, part2 = run(list(lines))
+        print("\nPART 1:\n")
+        print(part1)
+        print("\nPART 2:\n")
+        print(part2)
+
