@@ -1,7 +1,6 @@
 import sys
 from collections.abc import Sequence
 from functools import reduce
-from more_itertools import ichunked
 
 def parse(str_input: str):
     range_pair = str_input.split(',')
