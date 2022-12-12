@@ -18,15 +18,15 @@ class PrioItem(NamedTuple):
     pos: Pos
 
 
-def parse(map: list[str]) -> tuple[Pos, Pos, list[list[int]]]:
-    start_pos = Pos(0, 0)
+def parse(map: list[str], start_sign: str = "S") -> tuple[list[Pos], Pos, list[list[int]]]:
+    start_pos = []
     end_pos = Pos(0, 0)
     new_map: list[list[int]] = []
     for x, line in enumerate(map):
         new_map.append([])
         for y, char in enumerate(line.strip()):
-            if char == "S":
-                start_pos = Pos(x, y)
+            if char in  [start_sign, "S"]:
+                start_pos.append(Pos(x, y))
                 height = ord("a")
             elif char == "E":
                 end_pos = Pos(x, y)
@@ -57,25 +57,36 @@ def reachable(pos: Pos, map: list[list[int]], target: Pos) -> bool:
     return on_map(target, map) and climbable(pos, map, target)
 
 
+def find_shortest(data, start):
+    start_pos, end_pos, map = parse(data,start)
+
+    count = len(start_pos)
+    min_dists = []
+    for i,cur_pos in enumerate(start_pos, 1):
+        seen: list[Pos] = [cur_pos]
+        queue: PriorityQueue[PrioItem] = PriorityQueue()
+        dist: int = 0
+        while cur_pos != end_pos:
+            for item in neighbours(cur_pos):
+                if (item not in seen) and (reachable(cur_pos, map, item)):
+                    seen.append(item)
+                    queue.put(PrioItem(dist+1, item))
+
+            if queue.empty():
+                break
+            dist, cur_pos = queue.get()
+
+        if cur_pos == end_pos:
+            min_dists.append(dist)
+
+    return min(min_dists)
+
 def run(data: list[str]) -> tuple[str, str]:
-    start_pos, end_pos, map = parse(data)
-    seen: list[Pos] = []
-    queue: PriorityQueue[PrioItem] = PriorityQueue()
 
-    cur_pos: Pos = start_pos
-    dist: int = 0
-
-    while cur_pos != end_pos:
-        for item in neighbours(cur_pos):
-            if (item not in seen) and (reachable(cur_pos, map, item)):
-                queue.put(PrioItem(dist+1, item))
-
-        seen.append(cur_pos)
-        print(seen)
-        dist, cur_pos = queue.get()
-
-    part1 = dist
-    part2 = NIY
+    part1 = find_shortest(data, "S")
+    print("PART 1 DONE!")
+    print(part1)
+    part2 = find_shortest(data, "a")
 
     return str(part1), str(part2)
 
