@@ -80,8 +80,6 @@ def smaller(left, right):
 
 def run(data: list[str]) -> tuple[str, str]:
     pairs = [parse(chunk) for chunk in list(chunked(data, 3))]
-    with open("egen.txt", mode="w+") as f:
-        f.write(str(pairs))
 
     correct = [smaller(packet0, packet1) for packet0, packet1 in pairs]
 
