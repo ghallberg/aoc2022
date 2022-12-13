@@ -12,33 +12,37 @@ INPUT_FILE = "input/day13.txt"
 TEST_FILES = ["input/day13test.txt"]
 NIY = "501: NIY"
 
-# def build_list(inputs, cur_list) -> tuple[IterativeList, str]:
-#     if len(inputs) == 0:
-#         return cur_list, []
+def build_list(inputs, cur_list) -> tuple[IterativeList, str]:
+    if len(inputs) == 0:
+        return cur_list, []
 
-#     head, *tail = inputs
+    head, *tail = inputs
 
-#     if head == ',':
-#         return build_list(tail, cur_list)
+    if head == ',':
+        return build_list(tail, cur_list)
 
-#     elif head == ']':
-#         return cur_list, tail
+    elif head == ']':
+        return cur_list, tail
 
-#     elif head == '[':
-#         sub_list, rest = build_list(tail, [])
-#         cur_list.append(sub_list)
-#         return build_list(rest, cur_list)
+    elif head == '[':
+        sub_list, rest = build_list(tail, [])
+        cur_list.append(sub_list)
+        return build_list(rest, cur_list)
 
-#     else:
-#         return build_list(tail, cur_list + [int(head)])
+    else:
+        while len(tail) != 0 and (peek := tail[0]) not in [",", "[", "]"]:
+            head = head+peek
+            tail = tail[1:]
+
+        return build_list(tail, cur_list + [int(head)])
 
 
-# def list_from(str_list):
-#     return eval(str_list.strip())
+def list_from(str_list):
+    return build_list(str_list.strip()[1:-1], [])[0]
 
 
 def parse(data: list[str]) -> list[tuple[IterativeList, IterativeList]]:
-    return [eval(data[0].strip()), eval(data[1].strip())]
+    return [list_from(data[0]), list_from(data[1])]
 
 def smaller(left, right):
     left_int = type(left) is int
@@ -76,6 +80,8 @@ def smaller(left, right):
 
 def run(data: list[str]) -> tuple[str, str]:
     pairs = [parse(chunk) for chunk in list(chunked(data, 3))]
+    with open("egen.txt", mode="w+") as f:
+        f.write(str(pairs))
 
     correct = [smaller(packet0, packet1) for packet0, packet1 in pairs]
 
