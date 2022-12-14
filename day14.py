@@ -82,21 +82,25 @@ def pour_sand(rock, sand_spout, end, abyss = True):
         floor = end +2
 
     while True:
-        new_pos = next_pos(cur_pos, sand.union(rock), floor)
-        path.append(new_pos)
+        stuff = sand.union(rock)
+        new_pos = next_pos(cur_pos, stuff, floor)
         if new_pos == cur_pos:
+            # LANDED
             sand.add(cur_pos)
-            path = []
 
             if cur_pos == sand_spout:
                 # BLOCKED
-                return sand, path
+                return sand, []
 
-            cur_pos = sand_spout
+            cur_pos = path.pop()
+
         elif abyss and new_pos.y >= end:
             return sand, path
+
         else:
+            path.append(cur_pos)
             cur_pos = new_pos
+
 
 
 def run(data: list[str]) -> tuple[str, str]:
