@@ -14,12 +14,6 @@ class Pos(NamedTuple):
     y: int
 
 def parse(paths: list[str]):
-    max_x = 0
-    max_y = 0
-
-    min_x = inf
-    min_y = inf
-
     blocked = set()
 
     for path in paths:
@@ -34,24 +28,16 @@ def parse(paths: list[str]):
 
                 blocked.update([Pos(start.x, y) for y in range(low_y, high_y+1)])
 
-                if high_y > max_y:
-                    max_y = high_y
-                if low_y < min_y:
-                   min_y = low_y
 
             elif start.y == end.y:
                 low_x, high_x = sorted((start.x, end.x))
                 blocked.update([Pos(x, start.y) for x in range(low_x, high_x+1)])
-                if high_x > max_x:
-                    max_x = high_x
-                if low_x < min_x:
-                   min_x = low_x
 
             else:
                 raise ValueError("Path isn't a horizontal or vertical", start, end)
 
 
-    return blocked, Pos(min_x, min_y), Pos(max_x, max_y)
+    return blocked
 
 def draw_map(blocked, sand, path, sand_spout, min_pos, max_pos):
     for y in range(0, max_pos.y+1):
@@ -71,48 +57,74 @@ def draw_map(blocked, sand, path, sand_spout, min_pos, max_pos):
 
         print(line)
 
-def next_pos(cur_pos, blocked):
+def blocked(pos, stuff, floor):
+    return pos in stuff or pos.y >= floor
+
+
+def next_pos(cur_pos, stuff, floor = inf):
     cur_x, cur_y = cur_pos
 
     next_y = cur_y + 1
 
-    pos_pos = [Pos(cur_x, next_y), Pos(cur_x - 1, next_y), Pos(cur_x + 1, next_y), cur_pos]
+    candidates = [Pos(cur_x, next_y), Pos(cur_x - 1, next_y), Pos(cur_x + 1, next_y), cur_pos]
 
-    return next(x for x in pos_pos if x not in blocked)
+    return next(pos for pos in candidates if not blocked(pos, stuff, floor))
 
 
-def pour_sand(rock, sand_spout, abyss):
+def pour_sand(rock, sand_spout, end, abyss = True):
     sand = set()
     path = []
     cur_pos = sand_spout
 
+    if abyss:
+        floor = inf
+    else:
+        floor = end +2
+
     while True:
-        new_pos = next_pos(cur_pos, sand.union(rock))
+        new_pos = next_pos(cur_pos, sand.union(rock), floor)
         path.append(new_pos)
         if new_pos == cur_pos:
             sand.add(cur_pos)
-            cur_pos = sand_spout
             path = []
-        elif new_pos.y >= abyss.y:
+
+            if cur_pos == sand_spout:
+                # BLOCKED
+                return sand, path
+
+            cur_pos = sand_spout
+        elif abyss and new_pos.y >= end:
             return sand, path
         else:
             cur_pos = new_pos
 
 
-
-
 def run(data: list[str]) -> tuple[str, str]:
-    rock, min_pos, max_pos = parse(data)
+    rock = parse(data)
 
     sand_spout = Pos(500,0)
 
-    sand, path = pour_sand(rock, sand_spout, max_pos)
+    max_y = max([pos.y for pos in rock])
+    min_y = min([pos.y for pos in rock])
+    max_x = max([pos.x for pos in rock])
+    min_x = min([pos.x for pos in rock])
 
-    draw_map(rock, sand, path, sand_spout, min_pos, max_pos)
+    sand, path = pour_sand(rock, sand_spout, max_y)
+
+    draw_map(rock, sand, path, sand_spout, Pos(min_x, min_y), Pos(max_x, max_y))
 
     part1 = len(sand)
 
-    part2 = NIY
+    sand, path = pour_sand(rock, sand_spout, max_y, abyss = False)
+
+    max_y = max([pos.y for pos in rock.union(sand)])
+    min_y = min([pos.y for pos in rock.union(sand)])
+    max_x = max([pos.x for pos in rock.union(sand)])
+    min_x = min([pos.x for pos in rock.union(sand)])
+
+    draw_map(rock, sand, path, sand_spout, Pos(min_x, min_y), Pos(max_x, max_y))
+
+    part2 = len(sand)
 
     return str(part1), str(part2)
 
