@@ -57,18 +57,18 @@ def draw_map(blocked, sand, path, sand_spout, min_pos, max_pos):
 
         print(line)
 
-def blocked(pos, stuff, floor):
-    return pos in stuff or pos.y >= floor
+def blocked(pos, rock, sand, floor):
+    return pos in rock or pos in sand or pos.y >= floor
 
 
-def next_pos(cur_pos, stuff, floor = inf):
+def next_pos(cur_pos, rock, sand, floor = inf):
     cur_x, cur_y = cur_pos
 
     next_y = cur_y + 1
 
     candidates = [Pos(cur_x, next_y), Pos(cur_x - 1, next_y), Pos(cur_x + 1, next_y), cur_pos]
 
-    return next(pos for pos in candidates if not blocked(pos, stuff, floor))
+    return next(pos for pos in candidates if not blocked(pos, rock, sand, floor))
 
 
 def pour_sand(rock, sand_spout, end, abyss = True):
@@ -82,8 +82,7 @@ def pour_sand(rock, sand_spout, end, abyss = True):
         floor = end +2
 
     while True:
-        stuff = sand.union(rock)
-        new_pos = next_pos(cur_pos, stuff, floor)
+        new_pos = next_pos(cur_pos, rock, sand, floor)
         if new_pos == cur_pos:
             # LANDED
             sand.add(cur_pos)
