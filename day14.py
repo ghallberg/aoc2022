@@ -6,7 +6,7 @@ from math import inf
 DAY_NO = "14"
 
 INPUT_FILE = f"input/day{DAY_NO}.txt"
-TEST_FILES = [f"input/day{DAY_NO}test.txt"]
+TEST_FILES = [f"input/day{DAY_NO}test.txt", "input/tigge14.txt"]
 NIY = "501: NIY"
 
 class Pos(NamedTuple):
@@ -29,8 +29,11 @@ def parse(paths: list[str]):
 
         for start, end in pairwise(paths):
             if start.x == end.x:
+
                 low_y, high_y = sorted((start.y, end.y))
+
                 blocked.update([Pos(start.x, y) for y in range(low_y, high_y+1)])
+
                 if high_y > max_y:
                     max_y = high_y
                 if low_y < min_y:
@@ -69,7 +72,7 @@ def draw_map(blocked, sand, path, sand_spout, min_pos, max_pos):
         print(line)
 
 def next_pos(cur_pos, blocked):
-    cur_x,cur_y = cur_pos
+    cur_x, cur_y = cur_pos
 
     next_y = cur_y + 1
 
@@ -80,9 +83,8 @@ def next_pos(cur_pos, blocked):
 
 def pour_sand(rock, sand_spout, abyss):
     sand = set()
-
-    cur_pos = sand_spout
     path = []
+    cur_pos = sand_spout
 
     while True:
         new_pos = next_pos(cur_pos, sand.union(rock))
@@ -91,7 +93,7 @@ def pour_sand(rock, sand_spout, abyss):
             sand.add(cur_pos)
             cur_pos = sand_spout
             path = []
-        elif new_pos.x >= abyss.x or new_pos.y >= abyss.y:
+        elif new_pos.y >= abyss.y:
             return sand, path
         else:
             cur_pos = new_pos
@@ -108,11 +110,9 @@ def run(data: list[str]) -> tuple[str, str]:
 
     draw_map(rock, sand, path, sand_spout, min_pos, max_pos)
 
-
     part1 = len(sand)
 
     part2 = NIY
-
 
     return str(part1), str(part2)
 
